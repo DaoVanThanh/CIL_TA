@@ -287,7 +287,7 @@ class Appr(Inc_Learning_Appr):
         if len(self.exemplars_dataset) > 0:
             loss_ce = torch.nn.functional.cross_entropy(torch.cat(outputs, dim=1), targets)
         else:
-            loss_ce = torch.nn.functional.cross_entropy(outputs[t], targets - self.model.task_offset[t])
+            loss_ce = torch.nn.functional.cross_entropy(outputs[t], (targets - self.model.task_offset[t]).to(torch.long))
 
         if return_partial_losses:
             return self.lamb * loss_kd + loss_ce, loss_kd, loss_ce

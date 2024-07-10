@@ -242,7 +242,7 @@ class Appr(Inc_Learning_Appr):
             # Auxiliary KD
             # Knowledge distillation loss for current task on new network
             loss_kd_a = self.cross_entropy(outputs[t],
-                                                   targets_aux[t] - self.model.task_offset[t], exp=1.0 / self.T)
+                                                   (targets_aux[t] - self.model.task_offset[t]).to(torch.long), exp=1.0 / self.T)
         else:
             loss_kd, loss_kd_a = 0, 0
 
@@ -250,7 +250,7 @@ class Appr(Inc_Learning_Appr):
         if len(self.exemplars_dataset) > 0:
             loss_ce = torch.nn.functional.cross_entropy(torch.cat(outputs, dim=1), targets)
         else:
-            loss_ce = torch.nn.functional.cross_entropy(outputs[t], targets - self.model.task_offset[t])
+            loss_ce = torch.nn.functional.cross_entropy(outputs[t], (targets - self.model.task_offset[t]).to(torch.long))
 
         if return_partial_losses:
             return self.lamb * loss_kd + self.lamb_a * loss_kd_a + loss_ce, loss_kd, loss_kd_a, loss_ce
