@@ -6,8 +6,8 @@
 
 set -e
 
-eval "$(conda shell.bash hook)"
-conda activate FACIL
+# eval "$(conda shell.bash hook)"
+# conda activate FACIL
 
 num_tasks=10
 nc_first_task=20

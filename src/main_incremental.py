@@ -37,8 +37,8 @@ def main(argv=None):
                         help='Results path (default=%(default)s)')
     parser.add_argument('--exp-name', default=None, type=str,
                         help='Experiment name (default=%(default)s)')
-    # parser.add_argument('--tags', type=str, nargs='+', default=None,
-    #                     help='Tags for wandb run (default=%(default)s)')
+    parser.add_argument('--tags', type=str, nargs='+', default=None,
+                        help='Tags for wandb run (default=%(default)s)')
     parser.add_argument('--seed', type=int, default=0,
                         help='Random seed (default=%(default)s)')
     parser.add_argument('--log', default=['disk'], type=str, choices=['disk', 'tensorboard', 'wandb'],
@@ -239,9 +239,9 @@ def main(argv=None):
     full_exp_name += '_' + args.approach
     if args.exp_name is not None:
         full_exp_name += '_' + args.exp_name
-    # logger = MultiLogger(args.results_path, full_exp_name, loggers=args.log, save_models=args.save_models,
-    #                      tags=args.tags)
-    logger = MultiLogger(args.results_path, full_exp_name, loggers=args.log, save_models=args.save_models)
+    logger = MultiLogger(args.results_path, full_exp_name, loggers=args.log, save_models=args.save_models,
+                         tags=args.tags)
+    # logger = MultiLogger(args.results_path, full_exp_name, loggers=args.log, save_models=args.save_models)
     logger.log_args(argparse.Namespace(**args.__dict__, **appr_args.__dict__, **appr_exemplars_dataset_args.__dict__))
 
     # Loaders

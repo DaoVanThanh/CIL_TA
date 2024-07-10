@@ -36,7 +36,7 @@ if [ ${wu_epochs} -gt 0 ]; then
     --batch-size 128 \
     --seed ${seed} \
     --cache-first-task-model \
-    --log disk wandb \
+    --log disk \
     --results-path ${result_path} \
     --tags ${tag} \
     --approach lwf \
@@ -63,7 +63,7 @@ else
     --batch-size 128 \
     --seed ${seed} \
     --cache-first-task-model \
-    --log disk wandb \
+    --log disk \
     --results-path ${result_path} \
     --tags ${tag} \
     --approach lwf \
