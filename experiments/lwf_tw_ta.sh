@@ -42,7 +42,7 @@ if [ ${wu_epochs} -gt 0 ]; then
     --approach lwf \
     --lamb ${lamb} \
     --taskwise-kd \
-    --ta \
+    --ta True\
     --wu-nepochs ${wu_epochs} \
     --wu-lr 0.1 \
     --wu-fix-bn \
@@ -71,5 +71,5 @@ else
     --approach lwf \
     --lamb ${lamb} \
     --taskwise-kd \
-    --ta
+    --ta True
 fi

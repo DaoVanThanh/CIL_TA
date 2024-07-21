@@ -22,7 +22,7 @@ fi
 if [ ${wu_epochs} -gt 0 ]; then
   exp_name="${tag}:lamb_${lamb}:ta:wu"
   result_path="results/${tag}/lwf_ta_wu_${lamb}_${seed}"
-  python3 src/main_incremental.py \
+  python src/main_incremental.py \
     --exp-name ${exp_name} \
     --gpu ${gpu} \
     --datasets ${dataset} \
@@ -40,7 +40,7 @@ if [ ${wu_epochs} -gt 0 ]; then
     --results-path ${result_path} \
     --tags ${tag} \
     --approach lwf \
-    --ta \
+    --ta True\
     --lamb ${lamb} \
     --wu-nepochs ${wu_epochs} \
     --wu-lr 0.1 \
@@ -50,7 +50,7 @@ if [ ${wu_epochs} -gt 0 ]; then
 else
   exp_name="${tag}:lamb_${lamb}:ta"
   result_path="results/${tag}/lwf_ta_${lamb}_${seed}"
-  python3 src/main_incremental.py \
+  python src/main_incremental.py \
     --exp-name ${exp_name} \
     --gpu ${gpu} \
     --datasets ${dataset} \
@@ -68,6 +68,6 @@ else
     --results-path ${result_path} \
     --tags ${tag} \
     --approach lwf \
-    --ta \
+    --ta True\
     --lamb ${lamb}
 fi

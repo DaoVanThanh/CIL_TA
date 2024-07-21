@@ -41,7 +41,7 @@ if [ ${wu_epochs} -gt 0 ]; then
     --results-path ${result_path} \
     --tags ${tag} \
     --approach lwfa \
-    --ta \
+    --ta True\
     --lamb ${lamb} \
     --lamb-a ${lamb_a} \
     --wu-nepochs ${wu_epochs} \
@@ -70,7 +70,7 @@ else
     --results-path ${result_path} \
     --tags ${tag} \
     --approach lwfa \
-    --ta \
+    --ta True\
     --lamb ${lamb} \
     --lamb-a ${lamb_a}
 fi

@@ -72,7 +72,7 @@ class Appr(Inc_Learning_Appr):
         parser.add_argument('--taskwise-kd', default=False, action='store_true', required=False,
                             help='If set, will use task-wise KD loss as defined in SSIL. (default=%(default)s)')
 
-        parser.add_argument('--ta', default=False, action='store_true', required=False,
+        parser.add_argument('--ta', default=True, action='store_true', required=False,
                             help='Teacher adaptation. If set, will update old model batch norm params '
                                  'during training the new task. (default=%(default)s)')
 

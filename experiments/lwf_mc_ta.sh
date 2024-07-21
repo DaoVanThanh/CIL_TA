@@ -41,7 +41,7 @@ if [ ${wu_epochs} -gt 0 ]; then
     --tags ${tag} \
     --approach lwf \
     --mc \
-    --ta \
+    --ta True\
     --lamb ${lamb} \
     --wu-nepochs ${wu_epochs} \
     --wu-lr 0.1 \
@@ -70,6 +70,6 @@ else
     --tags ${tag} \
     --approach lwf \
     --mc \
-    --ta \
+    --ta True \
     --lamb ${lamb}
 fi
