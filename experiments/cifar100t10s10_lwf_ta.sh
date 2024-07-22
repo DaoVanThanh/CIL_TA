@@ -17,12 +17,24 @@ network=resnet32
 tag=cifar100t${num_tasks}s${nc_first_task}
 
 lamb=10
+lamb_mc=0.5
+lamb_tw=1.0
 beta=10
 gamma=1e-3
 
-for wu_nepochs in 0 200; do
-  for seed in 0 1 2; do
+for wu_nepochs in 0; do
+  for seed in 0; do
     ./experiments/lwf_ta.sh 0 ${seed} ${tag} ${dataset} ${num_tasks} ${nc_first_task} ${network} ${num_epochs} ${lamb} ${wu_nepochs} &
+  done
+  wait
+
+  for seed in 0; do
+    ./experiments/lwf_mc_ta.sh 0 ${seed} ${tag} ${dataset} ${num_tasks} ${nc_first_task} ${network} ${num_epochs} ${lamb_mc} ${wu_nepochs} &
+  done
+  wait
+
+  for seed in 0; do
+    ./experiments/lwf_tw_ta.sh 0 ${seed} ${tag} ${dataset} ${num_tasks} ${nc_first_task} ${network} ${num_epochs} ${lamb_tw} ${wu_nepochs} &
   done
   wait
 done
