@@ -11,7 +11,7 @@ nc_first_task=$6
 network=$7
 num_epochs=$8
 lamb_lwf=$9
-lamb_ewc=$10
+lamb_ewc=${10}
 wu_epochs=${11:-0}
 
 if [ "${dataset}" = "imagenet_subset_kaggle" ]; then
@@ -23,7 +23,7 @@ fi
 if [ ${wu_epochs} -gt 0 ]; then
   exp_name="${tag}:lamb_lwf${lamb_lwf}:lamb_ewc${lamb_ewc}:base:wu"
   result_path="results/${tag}/lwfewc_base_wu_${lamb_lwf}_${lamb_ewc}_${seed}"
-  python3 src/main_incremental.py \
+  python src/main_incremental.py \
     --exp-name ${exp_name} \
     --gpu ${gpu} \
     --datasets ${dataset} \
@@ -51,7 +51,7 @@ if [ ${wu_epochs} -gt 0 ]; then
 else
   exp_name="${tag}:lamb_lwf${lamb_lwf}:lamb_ewc${lamb_ewc}:base"
   result_path="results/${tag}/lwfewc_base_${lamb_lwf}_${lamb_ewc}_${seed}"
-  python3 src/main_incremental.py \
+  python src/main_incremental.py \
     --exp-name ${exp_name} \
     --gpu ${gpu} \
     --datasets ${dataset} \

@@ -44,7 +44,7 @@ class Appr(Inc_Learning_Appr):
         # lambda lwf is a loss balance weight, set to 1 for most our experiments. Making lambda larger will favor
         # the old task performance over the new task’s, so we can obtain a old-task-new-task performance line by
         # changing lambda.
-        parser.add_argument('--lamb_lwf', default=1, type=float, required=False,
+        parser.add_argument('--lamb-lwf', default=1, type=float, required=False,
                             help='Forgetting-intransigence trade-off in LwF (default=%(default)s)')
         parser.add_argument('--T', default=2, type=int, required=False,
                             help='Temperature scaling (default=%(default)s)')
@@ -53,7 +53,7 @@ class Appr(Inc_Learning_Appr):
         parser.add_argument('--taskwise_kd', default=False, action='store_true', required=False,
                             help='If set, will use task-wise KD loss as defined in SSIL. (default=%(default)s)')
         # lambda ewc sets how important the old task is compared to the new one"
-        parser.add_argument('--lamb_ewc', default=5000, type=float, required=False,
+        parser.add_argument('--lamb-ewc', default=5000, type=float, required=False,
                             help='Forgetting-intransigence trade-off in EWC (default=%(default)s)')
         parser.add_argument('--alpha', default=0.5, type=float, required=False,
                             help='EWC alpha (default=%(default)s)')
