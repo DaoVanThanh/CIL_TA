@@ -41,8 +41,8 @@ if [ ${wu_epochs} -gt 0 ]; then
     --results-path ${result_path} \
     --tags ${tag} \
     --approach lwf_ewc \
-    --lamb_lwf ${lamb_lwf} \
-    --lamb_ewc ${lamb_ewc} \
+    --lamb-lwf ${lamb_lwf} \
+    --lamb-ewc ${lamb_ewc} \
     --wu-nepochs ${wu_epochs} \
     --wu-lr 0.1 \
     --wu-fix-bn \
@@ -69,6 +69,6 @@ else
     --results-path ${result_path} \
     --tags ${tag} \
     --approach lwf_ewc \
-    --lamb_lwf ${lamb_lwf} \
-    --lamb_ewc ${lamb_ewc}
+    --lamb-lwf ${lamb_lwf} \
+    --lamb-ewc ${lamb_ewc}
 fi
