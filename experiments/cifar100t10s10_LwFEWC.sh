@@ -20,5 +20,5 @@ lamb_lwf=10
 lamb_ewc=5000
 
 for seed in 0 1 2; do
-  ./experiments/lwf_ewc.sh 0 ${seed} ${tag} ${dataset} ${num_tasks} ${nc_first_task} ${network} ${num_epochs} ${lamb_lwf} ${lamb_ewc} &
+  ./experiments/lwf_ewc.sh 0 ${seed} ${tag} ${dataset} ${num_tasks} ${nc_first_task} ${network} ${num_epochs} ${lamb_lwf} ${lamb_ewc}
 done
