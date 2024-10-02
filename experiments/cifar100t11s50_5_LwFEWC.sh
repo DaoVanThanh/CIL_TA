@@ -9,8 +9,8 @@ set -e
 # eval "$(conda shell.bash hook)"
 # conda activate ta
 
-num_tasks=10
-nc_first_task=10
+num_tasks=11
+nc_first_task=50
 num_epochs=200
 dataset=cifar100_icarl
 network=resnet32
@@ -22,3 +22,4 @@ lamb_ewc=5000
 for seed in 0 1 2; do
   ./experiments/lwf_ewc.sh 0 ${seed} ${tag} ${dataset} ${num_tasks} ${nc_first_task} ${network} ${num_epochs} ${lamb_lwf} ${lamb_ewc} &
 done
+wait
