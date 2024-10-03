@@ -12,11 +12,12 @@ class Appr(Inc_Learning_Appr):
     """
 
     def __init__(self, model, device, nepochs=100, lr=0.05, lr_min=1e-4, lr_factor=3, lr_patience=5, clipgrad=10000,
-                 momentum=0, wd=0, multi_softmax=False, wu_nepochs=0, wu_lr_factor=1, fix_bn=False, eval_on_train=False,
+                 momentum=0, wd=0, multi_softmax=False, wu_nepochs=0, wu_lr=1e-1,wu_fix_bn=False, 
+                 wu_scheduler='constant', wu_patience=None, wu_wd=0.,fix_bn=False, eval_on_train=False,
                  select_best_model_by_val_loss=True, logger=None, exemplars_dataset=None, scheduler_milestones=None,
                  lamb=5000, alpha=0.5, fi_sampling_type='max_pred', fi_num_samples=-1):
         super(Appr, self).__init__(model, device, nepochs, lr, lr_min, lr_factor, lr_patience, clipgrad, momentum, wd,
-                                   multi_softmax, wu_nepochs, wu_lr_factor, fix_bn, eval_on_train, select_best_model_by_val_loss,
+                                   multi_softmax, wu_nepochs, wu_lr, wu_fix_bn, wu_scheduler, wu_patience, wu_wd, fix_bn, eval_on_train, select_best_model_by_val_loss,
                                    logger, exemplars_dataset, scheduler_milestones)
         self.lamb = lamb
         self.alpha = alpha
@@ -144,4 +145,4 @@ class Appr(Inc_Learning_Appr):
         # Current cross-entropy loss -- with exemplars use all heads
         if len(self.exemplars_dataset) > 0:
             return loss + torch.nn.functional.cross_entropy(torch.cat(outputs, dim=1), targets)
-        return loss + torch.nn.functional.cross_entropy(outputs[t], targets - self.model.task_offset[t])
+        return loss + torch.nn.functional.cross_entropy(outputs[t], (targets - self.model.task_offset[t]).to(torch.long))
