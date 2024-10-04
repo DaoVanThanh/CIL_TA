@@ -19,6 +19,6 @@ tag=cifar100t${num_tasks}s${nc_first_task}
 lamb_lwf=10
 lamb_ewc=5000
 
-for seed in 0 1 2 3 4; do
+for seed in 5 6 7 8 9; do
   ./experiments/lwf_ewc.sh 0 ${seed} ${tag} ${dataset} ${num_tasks} ${nc_first_task} ${network} ${num_epochs} ${lamb_lwf} ${lamb_ewc}
 done

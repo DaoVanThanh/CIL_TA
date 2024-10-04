@@ -3,8 +3,6 @@ import itertools
 from copy import deepcopy
 from argparse import ArgumentParser
 
-# import torch.utils
-# from metrics import cka
 from datasets.exemplars_dataset import ExemplarsDataset
 from .incremental_learning import Inc_Learning_Appr
 
@@ -13,8 +11,7 @@ class Appr(Inc_Learning_Appr):
                  momentum=0, wd=0, multi_softmax=False, wu_nepochs=0, wu_lr=1e-1, wu_fix_bn=False,
                  wu_scheduler='constant', wu_patience=None, wu_wd=0., fix_bn=False, eval_on_train=False, 
                  select_best_model_by_val_loss=True, logger=None, exemplars_dataset=None, scheduler_milestones=None,
-                 lamb_lwf=1, T=2, mc=False, taskwise_kd=False, 
-                 lamb_ewc=5000, alpha=0.5, fi_sampling_type='max_pred', fi_num_samples=-1):
+                 lamb_lwf=1, T=2, lamb_ewc=5000, alpha=0.5, fi_sampling_type='max_pred', fi_num_samples=-1):
         super(Appr, self).__init__(model, device, nepochs, lr, lr_min, lr_factor, lr_patience, clipgrad,
                                    momentum, wd, multi_softmax, wu_nepochs, wu_lr, wu_fix_bn,
                                    wu_scheduler, wu_patience, wu_wd, fix_bn, eval_on_train,
@@ -22,8 +19,6 @@ class Appr(Inc_Learning_Appr):
         self.model_old = None
         self.lamb_lwf = lamb_lwf
         self.T = T
-        self.mc = mc
-        self.taskwise_kd = taskwise_kd
 
         self.lamb_ewc = lamb_ewc
         self.alpha = alpha
@@ -48,10 +43,7 @@ class Appr(Inc_Learning_Appr):
                             help='Forgetting-intransigence trade-off in LwF (default=%(default)s)')
         parser.add_argument('--T', default=2, type=int, required=False,
                             help='Temperature scaling (default=%(default)s)')
-        parser.add_argument('--mc', default=False, action='store_true', required=False,
-                            help='If set, will use LwF.MC variant from iCaRL. (default=%(default)s)')
-        parser.add_argument('--taskwise_kd', default=False, action='store_true', required=False,
-                            help='If set, will use task-wise KD loss as defined in SSIL. (default=%(default)s)')
+        
         # lambda ewc sets how important the old task is compared to the new one"
         parser.add_argument('--lamb-ewc', default=5000, type=float, required=False,
                             help='Forgetting-intransigence trade-off in EWC (default=%(default)s)')
@@ -81,7 +73,7 @@ class Appr(Inc_Learning_Appr):
             outputs = self.model.forward(images.to(self.device))
 
             if self.sampling_type == 'true':
-                preds = targets.tp(self.device)
+                preds = targets.to(self.device)
             elif self.sampling_type == 'max_pred':
                 preds = torch.cat(outputs, dim=1).argmax(1).flatten()
             elif self.sampling_type == 'multinomial':
@@ -107,7 +99,7 @@ class Appr(Inc_Learning_Appr):
                                                      pin_memory=trn_loader.pin_memory)
         super().train_loop(t, trn_loader, val_loader)
 
-        self.exemplars_dataset.collect_exemplars(self.model, trn_loader, val_loader)
+        self.exemplars_dataset.collect_exemplars(self.model, trn_loader, val_loader.dataset.transform)
     
     def train_epoch(self, t, trn_loader):
         self.model.train()
@@ -119,13 +111,11 @@ class Appr(Inc_Learning_Appr):
                 target_old = self.model_old.forward(images.to(self.device))
             outputs = self.model.forward(images.to(self.device))
             loss = self.criterion(t, outputs, targets.to(self.device), target_old)
+
             self.optimizer.zero_grad()
             loss.backward()
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.clipgrad)
             self.optimizer.step()
-
-        if self.scheduler is not None:
-            self.scheduler.step()
     
     def post_train_process(self, t, trn_loader):
         self.model_old = deepcopy(self.model)
@@ -146,8 +136,8 @@ class Appr(Inc_Learning_Appr):
         with torch.no_grad():
             total_loss, total_acc_taw, total_acc_tag, total_num = 0, 0, 0, 0
             self.model.eval()
-            if self.model_old is not None:
-                self.model_old.eval()
+            # if self.model_old is not None:
+            #     self.model_old.eval()
 
             for images, targets in val_loader:
                 images, targets = images.to(self.device), targets.to(self.device)
@@ -164,10 +154,6 @@ class Appr(Inc_Learning_Appr):
                 total_acc_taw += hits_taw.sum().data.cpu().numpy().item()
                 total_acc_tag += hits_tag.sum().data.cpu().numpy().item()
                 total_num += len(targets)
-
-        # if self.cka and t > 0 and self.training:
-        #     _cka = cka(self.model, self.model_old, val_loader, self.device)
-        #     self.logger.log_scalar(task=None, iter=None, name=f't_{t}', group=f"cka", value=_cka)
 
         return total_loss / total_num, total_acc_taw / total_num, total_acc_tag / total_num
     
@@ -188,28 +174,14 @@ class Appr(Inc_Learning_Appr):
     
     def criterion(self, t, outputs, targets, outputs_old=None):
         if t > 0 and outputs_old is not None:
+            # Elastic weight consolidation quadratic penalty
             loss_reg = 0
-            # Eq. 3: elastic weight consolidation quadratic penalty
             for n, p in self.model.model.named_parameters():
                 if n in self.fisher.keys():
                     loss_reg += torch.sum(self.fisher[n] * (p - self.older_params[n]).pow(2)) / 2
             # Knowledge distillation loss for all previous tasks
             kd_outputs, kd_outputs_old = torch.cat(outputs[:t], dim=1), torch.cat(outputs_old[:t], dim=1)
-            if self.mc:
-                g = torch.sigmoid(kd_outputs)
-                q_i = torch.sigmoid(kd_outputs_old)
-                loss_kd = sum(
-                    torch.nn.functional.binary_cross_entropy(g[:, y], q_i[:, y]) for y in range(kd_outputs.shape[-1])
-                )
-            elif self.taskwise_kd:
-                loss_kd = torch.zeros(t).to(self.device)
-                for _t in range(t):
-                    soft_target = torch.nn.functional.softmax(outputs_old[_t] / self.T, dim=1)
-                    output_log = torch.nn.functional.log_softmax(outputs[_t] / self.T, dim=1)
-                    loss_kd[_t] = torch.nn.functional.kl_div(output_log, soft_target, reduction='batchmean') * (self.T ** 2)
-                loss_kd = loss_kd.sum()
-            else:
-                loss_kd = self.cross_entropy(kd_outputs, kd_outputs_old, exp=1.0 / self.T)
+            loss_kd = self.cross_entropy(kd_outputs, kd_outputs_old, exp=1.0 / self.T)
         else:
             loss_reg = 0
             loss_kd = 0
