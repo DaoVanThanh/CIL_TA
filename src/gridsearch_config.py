@@ -22,6 +22,16 @@ class GridSearchConfig():
                 'lamb': [10],
                 'T': 2
             },
+            'lwf_test': {
+                'lamb': [10],
+                'T': 2
+            },
+            'lwf_ewc': {
+                'lamb_lwf': [10],
+                'T': 2,
+                'lamb_ewc': [5000],
+                'alpha': 0.5
+            },
             'icarl': {
                 'lamb': [4]
             },
