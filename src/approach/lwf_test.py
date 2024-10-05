@@ -192,16 +192,16 @@ class Appr(Inc_Learning_Appr):
 
             # Forward current model
             outputs = self.model(images)
-            loss, loss_kd, loss_ce = self.criterion(t, outputs, targets, targets_old, return_partial_losses=True)
-            if self.debug_loss:
-                self.logger.log_scalar(task=None, iter=None, name='loss_kd', group=f"debug_t{t}",
-                                       value=float(loss_kd))
-                self.logger.log_scalar(task=None, iter=None, name='loss_ce', group=f"debug_t{t}",
-                                       value=float(loss_ce))
-                self.logger.log_scalar(task=None, iter=None, name='loss_total', group=f"debug_t{t}",
-                                       value=float(loss))
+            loss = self.criterion(t, outputs, targets, targets_old)
+            # if self.debug_loss:
+            #     self.logger.log_scalar(task=None, iter=None, name='loss_kd', group=f"debug_t{t}",
+            #                            value=float(loss_kd))
+            #     self.logger.log_scalar(task=None, iter=None, name='loss_ce', group=f"debug_t{t}",
+            #                            value=float(loss_ce))
+            #     self.logger.log_scalar(task=None, iter=None, name='loss_total', group=f"debug_t{t}",
+            #                            value=float(loss))
 
-            assert not torch.isnan(loss), "Loss is NaN"
+            # assert not torch.isnan(loss), "Loss is NaN"
 
             # Backward
             self.optimizer.zero_grad()
@@ -236,9 +236,9 @@ class Appr(Inc_Learning_Appr):
                 total_acc_tag += hits_tag.sum().data.cpu().numpy().item()
                 total_num += len(targets)
 
-        if self.cka and t > 0 and self.training:
-            _cka = cka(self.model, self.model_old, val_loader, self.device)
-            self.logger.log_scalar(task=None, iter=None, name=f't_{t}', group=f"cka", value=_cka)
+        # if self.cka and t > 0 and self.training:
+        #     _cka = cka(self.model, self.model_old, val_loader, self.device)
+        #     self.logger.log_scalar(task=None, iter=None, name=f't_{t}', group=f"cka", value=_cka)
 
         return total_loss / total_num, total_acc_taw / total_num, total_acc_tag / total_num
 
