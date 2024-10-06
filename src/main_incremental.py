@@ -329,7 +329,7 @@ def main(argv=None):
             best_tradeoff, tradeoff_name = gridsearch.search_tradeoff(args.approach, appr,
                                                                       t, trn_loader[t], val_loader[t], best_ft_acc)
             # Apply to approach
-            if tradeoff_name is not None:
+            if (tradeoff_name is not None) and (best_tradeoff is not None):
                 setattr(appr, tradeoff_name, best_tradeoff)
 
             print('-' * 108)
