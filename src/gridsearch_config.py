@@ -27,9 +27,9 @@ class GridSearchConfig():
                 'T': 2
             },
             'lwf_ewc': {
-                'lamb_lwf': [10],
+                'lamb_lwf': 10,
                 'T': 2,
-                'lamb_ewc': [5000],
+                'lamb_ewc': 5000,
                 'alpha': 0.5
             },
             'icarl': {

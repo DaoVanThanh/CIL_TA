@@ -40,4 +40,5 @@ python src/main_incremental.py \
   --tags ${tag} \
   --approach lwf_ewc \
   --lamb-lwf ${lamb_lwf} \
-  --lamb-ewc ${lamb_ewc}
+  --lamb-ewc ${lamb_ewc} \
+  --gridsearch-tasks 10
