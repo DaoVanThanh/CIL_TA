@@ -116,6 +116,8 @@ class Appr(Inc_Learning_Appr):
             loss.backward()
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.clipgrad)
             self.optimizer.step()
+        if self.scheduler is not None:
+            self.scheduler.step()
     
     def post_train_process(self, t, trn_loader):
         self.model_old = deepcopy(self.model)
