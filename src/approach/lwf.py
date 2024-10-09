@@ -20,7 +20,7 @@ class Appr(Inc_Learning_Appr):
                  wu_scheduler='constant', wu_patience=None, wu_wd=0., fix_bn=False, eval_on_train=False,
                  select_best_model_by_val_loss=True, logger=None, exemplars_dataset=None, scheduler_milestones=None,
                  lamb=1, T=2, mc=False, taskwise_kd=False,
-                 ta=False,
+                 old_bn=False,
                  cka=False, debug_loss=False,
                  tp=False, ctt=False, bnp=False, cbnt=False, pretraining_epochs=5, ta_lr=1e-5,
                  ):
@@ -34,16 +34,16 @@ class Appr(Inc_Learning_Appr):
         self.mc = mc
         self.taskwise_kd = taskwise_kd
 
-        self.ta = ta
+        self.old_bn = old_bn
 
         self.tp = tp
         self.ctt = ctt
         self.bnp = bnp
         self.cbnt = cbnt
         if self.tp or self.ctt or self.bnp or self.cbnt:
-            assert not self.ta, "Cannot use both TA and TP/CTT/BNP/CBNT"
+            assert not self.old_bn, "Cannot use both TA and TP/CTT/BNP/CBNT"
         if sum([self.tp, self.ctt, self.bnp, self.cbnt]) > 1:
-            assert not self.ta, "Cannot use both TP and CTT and BNP and CBNT"
+            assert not self.old_bn, "Cannot use both TP and CTT and BNP and CBNT"
         self.pretraining_epochs = pretraining_epochs
         self.ta_lr = ta_lr
 
@@ -72,8 +72,8 @@ class Appr(Inc_Learning_Appr):
         parser.add_argument('--taskwise-kd', default=False, action='store_true', required=False,
                             help='If set, will use task-wise KD loss as defined in SSIL. (default=%(default)s)')
 
-        parser.add_argument('--ta', default=False, action='store_true', required=False,
-                            help='Teacher adaptation. If set, will update old model batch norm params '
+        parser.add_argument('--old-bn', default=False, action='store_true', required=False,
+                            help='If set, will update old model batch norm params '
                                  'during training the new task. (default=%(default)s)')
 
         parser.add_argument('--tp', default=False, action='store_true', required=False,
@@ -175,7 +175,7 @@ class Appr(Inc_Learning_Appr):
             # Forward old model
             targets_old = None
             if t > 0:
-                if self.ctt or self.cbnt or self.ta:
+                if self.ctt or self.cbnt or self.old_bn:
                     self.model_old.train()
                 else:
                     self.model_old.eval()
