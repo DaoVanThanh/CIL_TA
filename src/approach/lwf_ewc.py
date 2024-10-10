@@ -11,7 +11,8 @@ class Appr(Inc_Learning_Appr):
                  momentum=0, wd=0, multi_softmax=False, wu_nepochs=0, wu_lr=1e-1, wu_fix_bn=False,
                  wu_scheduler='constant', wu_patience=None, wu_wd=0., fix_bn=False, eval_on_train=False, 
                  select_best_model_by_val_loss=True, logger=None, exemplars_dataset=None, scheduler_milestones=None,
-                 lamb_lwf=1, T=2, lamb_ewc=5000, alpha=0.5, fi_sampling_type='max_pred', fi_num_samples=-1):
+                 lamb_lwf=1, T=2, lamb_ewc=5000, alpha=0.5, fi_sampling_type='max_pred', fi_num_samples=-1,
+                 old_bn=False):
         super(Appr, self).__init__(model, device, nepochs, lr, lr_min, lr_factor, lr_patience, clipgrad,
                                    momentum, wd, multi_softmax, wu_nepochs, wu_lr, wu_fix_bn,
                                    wu_scheduler, wu_patience, wu_wd, fix_bn, eval_on_train,
@@ -28,6 +29,8 @@ class Appr(Inc_Learning_Appr):
         feat_ext = self.model.model
         self.older_params = {n: p.clone().detach() for n, p in feat_ext.named_parameters() if p.requires_grad}
         self.fisher = {n: torch.zeros(p.shape).to(device) for n, p in feat_ext.named_parameters() if p.requires_grad}
+
+        self.old_bn = old_bn
 
     @staticmethod
     def exemplars_dataset_class():
@@ -54,6 +57,10 @@ class Appr(Inc_Learning_Appr):
                             help='Sampling type for Fisher information (default=%(default)s)')
         parser.add_argument('--fi-num-samples', default=-1, type=int, required=False,
                             help='Number of samples for Fisher information (-1: all available) (default=%(default)s)')
+
+        parser.add_argument('--old-bn', default=False, action='store_true', required=False,
+                            help='If set, will update old model batch norm params '
+                                 'during training the new task. (default=%(default)s)')
 
         return parser.parse_known_args(args)
     
@@ -108,6 +115,7 @@ class Appr(Inc_Learning_Appr):
         for images, targets in trn_loader:
             target_old = None
             if t > 0:
+                self.model_old.train()
                 target_old = self.model_old.forward(images.to(self.device))
             outputs = self.model.forward(images.to(self.device))
             loss = self.criterion(t, outputs, targets.to(self.device), target_old)
