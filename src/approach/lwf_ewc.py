@@ -115,7 +115,10 @@ class Appr(Inc_Learning_Appr):
         for images, targets in trn_loader:
             target_old = None
             if t > 0:
-                self.model_old.train()
+                if self.old_bn:
+                    self.model_old.train()
+                else:
+                    self.model_old.eval()
                 target_old = self.model_old.forward(images.to(self.device))
             outputs = self.model.forward(images.to(self.device))
             loss = self.criterion(t, outputs, targets.to(self.device), target_old)
