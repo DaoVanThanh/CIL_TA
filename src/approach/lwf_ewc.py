@@ -99,8 +99,8 @@ class Appr(Inc_Learning_Appr):
     
     def train_loop(self, t, trn_loader, val_loader):
         if len(self.exemplars_dataset) > 0 and t > 0:
-            trn_loader = torch.utils.data.Dataloader(trn_loader.dataset + self.exemplars_dataset,
-                                                     batchsize=trn_loader.batch_size,
+            trn_loader = torch.utils.data.DataLoader(trn_loader.dataset + self.exemplars_dataset,
+                                                     batch_size=trn_loader.batch_size,
                                                      shuffle=True,
                                                      num_workers=trn_loader.num_workers,
                                                      pin_memory=trn_loader.pin_memory)
@@ -200,7 +200,7 @@ class Appr(Inc_Learning_Appr):
             loss_kd = 0
 
         if len(self.exemplars_dataset) > 0:
-            loss_ce = torch.nn.functional.cross_entropy(torch.cat(outputs, dim=1), targets)
+            loss_ce = torch.nn.functional.cross_entropy(torch.cat(outputs, dim=1), targets.to(torch.long))
         else:
             loss_ce = torch.nn.functional.cross_entropy(outputs[t], (targets - self.model.task_offset[t]).to(torch.long))
 
