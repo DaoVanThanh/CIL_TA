@@ -24,6 +24,10 @@ from datasets.data_loader import get_loaders
 
 torch.multiprocessing.set_sharing_strategy('file_system')
 
+def none_or_int(value):
+    if value == 'None':
+        return None
+    return value
 
 def main(argv=None):
     tstart = time.time()
@@ -102,7 +106,7 @@ def main(argv=None):
                         help='Number of epochs per training session (default=%(default)s)')
     parser.add_argument('--lr', default=0.1, type=float, required=False,
                         help='Starting learning rate (default=%(default)s)')
-    parser.add_argument('--scheduler-milestones', default=[60, 120, 160], nargs='+', type=int, required=False,
+    parser.add_argument('--scheduler-milestones', default=[60, 120, 160], nargs='+', type=none_or_int, required=False,
                         help='Milestones for learning rate scheduler, overrides lr-patience scheme, '
                              'if set to None scheduler will not be used (default=%(default)s)')
     parser.add_argument('--lr-min', default=1e-4, type=float, required=False,
@@ -146,6 +150,8 @@ def main(argv=None):
     # Args -- Incremental Learning Framework
     args, extra_args = parser.parse_known_args(argv)
     args.results_path = os.path.expanduser(args.results_path)
+    if None in args.scheduler_milestones:
+        args.scheduler_milestones = None
     base_kwargs = dict(nepochs=args.nepochs, lr=args.lr, lr_min=args.lr_min, lr_factor=args.lr_factor,
                        lr_patience=args.lr_patience, clipgrad=args.clipping, momentum=args.momentum,
                        wd=args.weight_decay, multi_softmax=args.multi_softmax, wu_nepochs=args.wu_nepochs,
