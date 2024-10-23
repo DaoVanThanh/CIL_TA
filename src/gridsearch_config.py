@@ -19,11 +19,7 @@ class GridSearchConfig():
             'joint': {
             },
             'lwf': {
-                'lamb': [10],
-                'T': 2
-            },
-            'lwf_test': {
-                'lamb': [10],
+                'lamb': 10,
                 'T': 2
             },
             'lwf_ewc': {
