@@ -385,7 +385,7 @@ class Inc_Learning_Appr:
             pred = torch.cat(outputs, dim=1).argmax(1)
         else:
             pred = torch.cat(outputs, dim=1).argmax(1)
-        hits_tag = (pred == targets).float()
+        hits_tag = (pred == targets.to(self.device)).float()
         return hits_taw, hits_tag
 
     def criterion(self, t, outputs, targets):

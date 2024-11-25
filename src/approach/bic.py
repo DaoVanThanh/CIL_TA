@@ -285,9 +285,9 @@ class Appr(Inc_Learning_Appr):
         if self.lamb == -1:
             lamb = (self.model.task_cls[:t].sum().float() / self.model.task_cls.sum()).to(self.device)
             return (1.0 - lamb) * torch.nn.functional.cross_entropy(torch.cat(outputs, dim=1),
-                                                                    targets) + lamb * loss_dist
+                                                                    targets.to(torch.long)) + lamb * loss_dist
         else:
-            return torch.nn.functional.cross_entropy(torch.cat(outputs, dim=1), targets) + self.lamb * loss_dist
+            return torch.nn.functional.cross_entropy(torch.cat(outputs, dim=1), targets.to(torch.long)) + self.lamb * loss_dist
 
 
 class BiasLayer(torch.nn.Module):
