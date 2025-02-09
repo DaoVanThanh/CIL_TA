@@ -1,13 +1,36 @@
-# cl-teacher-adaptation
+ # Repository
+This repository is based on [FACIL](https://github.com/mmasana/FACIL).
 
-Source code for the paper **Adapt Your Teacher: Improving Knowledge Distillation for Exemplar-free Continual Learning**.
+# Objectives
+This project aims to develop and implement novel Class Incremental Learning approach that effectively mitigate catastrophic forgetting while improving model adaptability to new classes.
 
-*Filip Szatkowski, Mateusz Pyla, Marcin Przewięźlikowski, Sebastian Cygert, Bartłomiej Twardowski, Tomasz Trzciński*
+# Installation
+Install required dependencies:
 
-The paper was accepted to WACV 2024 ([arxiv](https://arxiv.org/abs/2308.09544)). 
+    pip install -r requirements.txt
 
-# Repository
-This repository is based on [FACIL](https://github.com/mmasana/FACIL). Please check **experiments** directory for the training scripts used for the experiments in the paper.
-
-# Citing
-If this repository is useful to you, please cite the arxiv paper.
+# Usage
+    python src/main_incremental.py 
+    --exp-name cifar100t10s10 
+    --gpu 0 
+    --datasets cifar100_icarl 
+    --num-tasks 10
+    --nc-first-task 10
+    --gridsearch-tasks 10 
+    --network resnet32 
+    --lr 0.1 
+    --clipping 100.0 
+    --nepochs 200 
+    --batch-size 128 
+    --seed 0 
+    --log disk tensorboard wandb
+    --results-path results/cifar100t10s10/lwf_ewc 
+    --tags cifar100t10s10 
+    --approach lwf_ewc 
+    --T 2 
+    --lamb-lwf 10 
+    --lamb-ewc 10000 
+    --eval-on-train 
+    --save-models 
+    --num-exemplars 2000
+    --exemplar-selection herding
